@@ -1,0 +1,101 @@
+.loading-message, .error-message {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: 600;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.loading-message {
+  background-color: #f0f8ff;
+  color: #3498DB;
+}
+
+.error-message {
+  background-color: #ffe0e0;
+  color: #A81921;
+}
+
+.chart-dashboard {
+  padding: 10px;
+}
+
+.chart-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+/* Base styles for all chart containers */
+.chart-container, .chart-container-full {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
+  /* --- ADDED MINIMUM DIMENSIONS TO ENSURE LAYOUT STABILITY FOR CHARTS --- */
+  min-height: 350px; 
+  min-width: 300px;
+}
+
+.chart-container {
+  flex: 1; /* Both charts take up equal width */
+}
+
+.chart-container-half {
+  flex: 1;
+}
+
+.chart-container-full {
+  width: 100%; /* Table component takes full width */
+}
+
+.chart-box h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #333;
+  font-weight: 700;
+  font-size: 1.2em;
+}
+
+/* Table Specific Styling */
+.country-table-wrapper {
+  overflow-x: auto;
+}
+
+.country-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.country-table th, .country-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.country-table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9em;
+  color: #555;
+}
+
+.country-table tr:hover {
+  background-color: #f5f5ff;
+}
+
+.cfr-value {
+  font-weight: 700;
+  color: #A81921; /* Red accent for the high fatality values */
+}
+
+
+/* Responsive Layout for Charts */
+@media (max-width: 992px) {
+  .chart-row {
+    flex-direction: column;
+  }
+}
