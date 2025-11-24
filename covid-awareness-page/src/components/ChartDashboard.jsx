@@ -268,6 +268,7 @@ function ChartDashboard() {
   // Selected country state for side panel
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [mapMetric, setMapMetric] = useState('Cases');
+  const [chartPage, setChartPage] = useState('cases');
 
   const handleCountrySelect = (countryName) => {
     setSelectedCountry(countryName);
@@ -284,16 +285,45 @@ function ChartDashboard() {
     }
 
 
+  const chartViews = {
+    cases: {
+      id: 'cases',
+      title: 'Global Daily New Cases',
+      component: <DailyCasesChart data={globalDailyTrends} />,
+      pageLabel: 'Page 1',
+    },
+    deaths: {
+      id: 'deaths',
+      title: 'Global Daily New Deaths',
+      component: <DailyDeathsChart data={globalDailyTrends} />,
+      pageLabel: 'Page 2',
+    },
+  };
+
+  const activeChart = chartViews[chartPage] || chartViews.cases;
+  const nextChartKey = activeChart.id === 'cases' ? 'deaths' : 'cases';
+  const nextChart = chartViews[nextChartKey];
+
   return (
     <div className="chart-dashboard" style={{ height: '100%' }}>
       <div className="chart-row">
-        <div className="chart-container">
-          {/* Pass data as a prop */}
-          <DailyCasesChart data={globalDailyTrends} />
-        </div>
-        <div className="chart-container">
-          {/* Pass data as a prop */}
-          <DailyDeathsChart data={globalDailyTrends} />
+        <div className="chart-container chart-container-full chart-page-card">
+          <button
+            type="button"
+            className="chart-page-header"
+            onClick={() => setChartPage(nextChart.id)}
+            aria-label={`Go to ${nextChart.title}`}
+          >
+            <div>
+              <p className="chart-page-eyebrow">{activeChart.pageLabel}</p>
+              <h3>{activeChart.title}</h3>
+            </div>
+            <div className="chart-page-link">
+              View {nextChart.title}
+              <span aria-hidden="true">→</span>
+            </div>
+          </button>
+          <div className="chart-page-body">{activeChart.component}</div>
         </div>
       </div>
       {/* Top 10 CFR table: full width above the map */}

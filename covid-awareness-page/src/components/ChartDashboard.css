@@ -138,6 +138,55 @@
   box-shadow: 0 28px 60px rgba(22,38,54,0.08);
 }
 
+.chart-page-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.chart-page-header {
+  width: 100%;
+  border: none;
+  background: rgba(255,255,255,0.03);
+  color: inherit;
+  text-align: left;
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.chart-page-header:hover,
+.chart-page-header:focus-visible {
+  background: rgba(255,255,255,0.08);
+  color: #ffffff;
+}
+
+.chart-page-body {
+  padding: 0 22px 22px;
+}
+
+.chart-page-eyebrow {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: rgba(191, 230, 255, 0.7);
+  margin: 0;
+}
+
+.chart-page-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #6cc6ff;
+}
+
+.chart-page-link span {
+  font-size: 1rem;
+}
+
 .chart-wrapper {
   width: 100%;
   height: clamp(280px, 52vw, 360px);
@@ -162,6 +211,14 @@
     height: clamp(240px, 60vw, 320px);
   }
 
+  .chart-page-header {
+    padding: 16px 18px;
+  }
+
+  .chart-page-body {
+    padding: 0 18px 18px;
+  }
+
   .country-stats {
     flex-direction: column;
     gap: 8px;
@@ -177,6 +234,14 @@
 
   .chart-box h3 {
     font-size: 1rem;
+  }
+
+  .chart-page-header {
+    gap: 4px;
+  }
+
+  .chart-page-link {
+    font-size: 0.85rem;
   }
 
   .country-table th,
