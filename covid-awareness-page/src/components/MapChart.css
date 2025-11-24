@@ -90,3 +90,45 @@
   cursor: pointer;
   filter: brightness(0.98) saturate(1.02);
 }
+
+@media (max-width: 768px) {
+  .map-wrapper {
+    min-height: 260px;
+  }
+
+  .map-controls {
+    top: auto;
+    bottom: 14px;
+    right: 14px;
+    flex-direction: row;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(7, 18, 38, 0.88);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+
+  .map-ctrl {
+    width: 36px;
+    height: 36px;
+  }
+
+  .map-selection {
+    margin: 0 0 0 6px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-controls {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    padding: 6px 8px;
+  }
+
+  .map-selection {
+    display: none;
+  }
+}
