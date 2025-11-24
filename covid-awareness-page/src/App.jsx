@@ -7,6 +7,7 @@ function App() {
   // The POWER_BI_EMBED_URL is no longer needed since we are using native charts
   
   return (
+    <>
     <div className="container">
       
       <header className="header">
@@ -43,11 +44,12 @@ function App() {
         <ChartDashboard /> 
       </section>
       
-      {/* 3. Awareness Footer */}
-      <footer className="footer">
-        <p>Data provided for educational purposes. Source: JHU CSSE. Consult official health organizations for guidance.</p>
-      </footer>
     </div>
+    {/* Footer moved outside the main container to sit at the bottom of the page */}
+    <footer className="footer">
+      <p>Data provided for educational purposes. Source: JHU CSSE. Consult official health organizations for guidance.</p>
+    </footer>
+    </>
   );
 }
 

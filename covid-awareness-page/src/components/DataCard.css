@@ -1,32 +1,33 @@
 .data-card {
-  padding: 15px;
-  border-left: 5px solid; /* Uses the color prop */
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s;
+  padding: 18px;
+  border-left: 6px solid; /* Uses the color prop */
+  background: linear-gradient(180deg, #0b1622, #071226);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  transition: transform 0.22s, box-shadow 0.22s;
 }
 
 .data-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(22,38,54,0.08);
 }
 
 .card-title {
   font-weight: 700;
-  font-size: 0.9em;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
+  color: #9fb3c8;
 }
 
 .card-value {
-  font-size: 2em;
+  font-size: 1.9rem;
   font-weight: 800;
-  color: #333;
+  color: #e6f6ff;
 }
 
 .card-description {
-  font-size: 0.8em;
-  color: #777;
-  margin-top: 5px;
+  font-size: 0.85rem;
+  color: #9fb3c8;
+  margin-top: 8px;
 }
