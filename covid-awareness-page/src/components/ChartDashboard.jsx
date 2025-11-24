@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend
-  // ResponsiveContainer is removed to resolve the hook conflict
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from 'recharts';
 import './ChartDashboard.css'; // New CSS file for this component
 import MapChart from './MapChart';
@@ -82,48 +88,46 @@ const parseCSV = (csvText) => {
 const DailyCasesChart = ({ data: globalDailyTrends }) => (
   <div className="chart-box">
     <h3>Global Daily New Cases</h3>
-    {/* Removed ResponsiveContainer and set width/height directly */}
-    <LineChart width={480} height={300} data={globalDailyTrends} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-      <XAxis 
-        dataKey="Date" 
-        tickFormatter={(tick) => new Date(tick).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-      />
-      <YAxis label={{ value: 'Cases', angle: -90, position: 'insideLeft' }} />
-      <Tooltip />
-      <Legend />
-      <Line 
-        type="monotone" 
-        dataKey="New_Cases" 
-        stroke="#27AE60" 
-        strokeWidth={2}
-        dot={false}
-      />
-    </LineChart>
+    <div className="chart-wrapper">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={globalDailyTrends} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis
+            dataKey="Date"
+            tickFormatter={(tick) =>
+              new Date(tick).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            }
+          />
+          <YAxis label={{ value: 'Cases', angle: -90, position: 'insideLeft' }} />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="New_Cases" stroke="#27AE60" strokeWidth={2} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   </div>
 );
 
 const DailyDeathsChart = ({ data: globalDailyTrends }) => (
   <div className="chart-box">
     <h3>Global Daily New Deaths</h3>
-    {/* Removed ResponsiveContainer and set width/height directly */}
-    <LineChart width={480} height={300} data={globalDailyTrends} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-      <XAxis 
-        dataKey="Date" 
-        tickFormatter={(tick) => new Date(tick).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-      />
-      <YAxis label={{ value: 'Deaths', angle: -90, position: 'insideLeft' }} />
-      <Tooltip />
-      <Legend />
-      <Line 
-        type="monotone" 
-        dataKey="New_Deaths" 
-        stroke="#A81921" 
-        strokeWidth={2}
-        dot={false}
-      />
-    </LineChart>
+    <div className="chart-wrapper">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={globalDailyTrends} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis
+            dataKey="Date"
+            tickFormatter={(tick) =>
+              new Date(tick).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            }
+          />
+          <YAxis label={{ value: 'Deaths', angle: -90, position: 'insideLeft' }} />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="New_Deaths" stroke="#A81921" strokeWidth={2} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   </div>
 );
 
@@ -180,7 +184,7 @@ function ChartDashboard() {
     
     // Safety check inside useMemo is fine, as the hook itself is always called.
     if (data.length === 0) {
-        return { globalDailyTrends: [], countryCFRs: [] };
+        return { globalDailyTrends: [], countryCFRsTop10: [], countryCFRsAll: [] };
     }
 
     // 1. Global Daily Trends (compute New_Cases from Cumulative_Cases and sum New_Deaths)

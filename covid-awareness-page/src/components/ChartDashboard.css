@@ -137,3 +137,63 @@
   transform: translateY(-8px);
   box-shadow: 0 28px 60px rgba(22,38,54,0.08);
 }
+
+.chart-wrapper {
+  width: 100%;
+  height: 320px;
+}
+
+@media (max-width: 768px) {
+  .chart-dashboard {
+    padding: 8px;
+  }
+
+  .chart-row {
+    gap: 12px;
+  }
+
+  .chart-container,
+  .chart-container-full {
+    padding: 14px;
+    min-height: 260px;
+  }
+
+  .chart-wrapper {
+    height: 260px;
+  }
+
+  .country-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-container,
+  .chart-container-full {
+    padding: 12px;
+    min-width: 0;
+  }
+
+  .chart-box h3 {
+    font-size: 1rem;
+  }
+
+  .country-table th,
+  .country-table td {
+    padding: 8px 10px;
+  }
+
+  .chart-wrapper {
+    height: 220px;
+  }
+
+  .country-table-wrapper {
+    margin: 0 -6px;
+  }
+
+  .chart-dashboard select,
+  .chart-dashboard label {
+    font-size: 0.9rem;
+  }
+}
