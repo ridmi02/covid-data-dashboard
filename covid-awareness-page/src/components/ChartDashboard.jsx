@@ -32,10 +32,21 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  ToggleButtonGroup,
+  ToggleButton,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import countriesLib from 'i18n-iso-countries';
+import enLocale from 'i18n-iso-countries/langs/en.json';
+import { countries as countriesMeta } from 'countries-list';
 import './ChartDashboard.css';
 import MapChart from './MapChart';
+
+try {
+  countriesLib.registerLocale(enLocale);
+} catch (e) {
+  // ignore if already registered
+}
 
 // Robust CSV parser that handles quoted fields and commas inside quotes (basic RFC-4180)
 const parseCSV = (csvText) => {
@@ -104,9 +115,41 @@ const parseCSV = (csvText) => {
   return data;
 };
 
+const REGION_FILTERS = [
+  { value: 'global', label: 'Global', continentCodes: null },
+  { value: 'africa', label: 'Africa', continentCodes: ['AF'] },
+  { value: 'asia', label: 'Asia', continentCodes: ['AS'] },
+  { value: 'europe', label: 'Europe', continentCodes: ['EU'] },
+  { value: 'north-america', label: 'North America', continentCodes: ['NA'] },
+  { value: 'south-america', label: 'South America', continentCodes: ['SA'] },
+  { value: 'oceania', label: 'Oceania', continentCodes: ['OC'] },
+];
+
 const toNumber = (value) => {
   const num = Number(value);
   return Number.isFinite(num) ? num : 0;
+};
+
+const getContinentCodeForCountry = (countryName) => {
+  if (!countryName) return null;
+  try {
+    const alpha2 = countriesLib.getAlpha2Code(countryName, 'en');
+    if (alpha2) {
+      const meta = countriesMeta[alpha2];
+      if (meta && meta.continent) return meta.continent;
+    }
+  } catch (e) {
+    return null;
+  }
+  return null;
+};
+
+const matchesRegionFilter = (countryName, filterValue) => {
+  if (filterValue === 'global') return true;
+  const filter = REGION_FILTERS.find((f) => f.value === filterValue);
+  if (!filter) return true;
+  const continent = getContinentCodeForCountry(countryName);
+  return continent ? filter.continentCodes?.includes(continent) : false;
 };
 
 // --- CHART COMPONENTS MOVED OUTSIDE OF ChartDashboard ---
@@ -216,6 +259,7 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [internalChartPage, setInternalChartPage] = useState('cases');
+  const [regionFilter, setRegionFilter] = useState('global');
 
   // useEffect is hook #4
   useEffect(() => {
@@ -234,10 +278,15 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
   }, []);
 
   // useMemo is hook #5. It MUST be called unconditionally.
+  const filteredData = useMemo(() => {
+    if (regionFilter === 'global') return data;
+    return data.filter((row) => matchesRegionFilter(row.Country, regionFilter));
+  }, [data, regionFilter]);
+
   const { globalDailyTrends, countryCFRsTop10, countryCFRsAll } = useMemo(() => {
     
     // Safety check inside useMemo is fine, as the hook itself is always called.
-    if (data.length === 0) {
+    if (filteredData.length === 0) {
         return { globalDailyTrends: [], countryCFRsTop10: [], countryCFRsAll: [] };
     }
 
@@ -247,7 +296,7 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
     const prevCumCasesByCountry = {};
     const prevCumDeathsByCountry = {};
 
-    data.forEach(row => {
+    filteredData.forEach(row => {
       const date = row.Date;
       if (!globalDailyDataMap[date]) {
         globalDailyDataMap[date] = {
@@ -280,7 +329,7 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
     const trends = Object.values(globalDailyDataMap).slice(-180);
 
     // 2. Top CFR Countries: capture max cumulative counts per country to avoid trailing zero rows
-    const countryTotalsMap = data.reduce((acc, row) => {
+    const countryTotalsMap = filteredData.reduce((acc, row) => {
       if (!row || !row.Country) return acc;
       const country = row.Country;
       const cases = toNumber(row.Cumulative_Cases);
@@ -309,10 +358,14 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
 
     return { globalDailyTrends: trends, countryCFRsTop10: top10, countryCFRsAll: countryTotals };
 
-  }, [data]); // Only recalculate when raw data changes
+  }, [filteredData]); // Only recalculate when raw data changes
 
   // Selected country state for side panel
   const [mapMetric, setMapMetric] = useState('Cases');
+
+  const handleRegionChange = (_, value) => {
+    if (value) setRegionFilter(value);
+  };
 
   // 2. CONDITIONAL RETURNS COME AFTER ALL HOOKS
 
@@ -353,6 +406,36 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
 
   return (
     <Stack spacing={3}>
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        spacing={2}
+        alignItems={{ xs: 'flex-start', md: 'center' }}
+        justifyContent="space-between"
+      >
+        <Stack spacing={0.5}>
+          <Typography variant="overline" color="text.secondary">
+            Region focus
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Filter every visualization by continent to understand localized outbreaks without global dilution.
+          </Typography>
+        </Stack>
+        <ToggleButtonGroup
+          value={regionFilter}
+          exclusive
+          size="small"
+          onChange={handleRegionChange}
+          aria-label="Region filter"
+          color="primary"
+        >
+          {REGION_FILTERS.map((region) => (
+            <ToggleButton key={region.value} value={region.value} aria-label={region.label}>
+              {region.label}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      </Stack>
+
       <Card
         elevation={10}
         sx={{
