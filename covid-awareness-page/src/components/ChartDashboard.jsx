@@ -10,7 +10,31 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import './ChartDashboard.css'; // New CSS file for this component
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  Stack,
+  Typography,
+  Button,
+  Grid,
+  Divider,
+  Chip,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import './ChartDashboard.css';
 import MapChart from './MapChart';
 
 // Robust CSV parser that handles quoted fields and commas inside quotes (basic RFC-4180)
@@ -132,27 +156,45 @@ const DailyDeathsChart = ({ data: globalDailyTrends }) => (
 );
 
 const TopCFRTable = ({ data: countryCFRs }) => (
-  <div className="chart-box">
-    <h3>Top 10 Countries by Case Fatality Ratio (CFR)</h3>
-    <div className="country-table-wrapper">
-      <table className="country-table">
-        <thead>
-          <tr>
-            <th>Country</th>
-            <th>CFR (%)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {countryCFRs.map((item, index) => (
-            <tr key={item.Country}>
-              <td>{item.Country}</td>
-              <td className="cfr-value">{item.CFR.toFixed(2)}%</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <TableContainer
+    component={Paper}
+    elevation={0}
+    sx={{ background: 'transparent', boxShadow: 'none' }}
+  >
+    <Table size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase' }}>Country</TableCell>
+          <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase' }} align="right">
+            CFR (%)
+          </TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {countryCFRs.map((item) => (
+          <TableRow
+            key={item.Country}
+            hover
+            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+          >
+            <TableCell>
+              <Typography variant="body2" fontWeight={600}>
+                {item.Country}
+              </Typography>
+            </TableCell>
+            <TableCell align="right">
+              <Chip
+                size="small"
+                color="error"
+                label={`${item.CFR.toFixed(2)}%`}
+                sx={{ fontWeight: 700 }}
+              />
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
 );
 
 // --- MAIN DASHBOARD COMPONENT ---
@@ -267,13 +309,8 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
   }, [data]); // Only recalculate when raw data changes
 
   // Selected country state for side panel
-  const [selectedCountry, setSelectedCountry] = useState(null);
   const [mapMetric, setMapMetric] = useState('Cases');
 
-  const handleCountrySelect = (countryName) => {
-    setSelectedCountry(countryName);
-  };
-  
   // 2. CONDITIONAL RETURNS COME AFTER ALL HOOKS
 
   if (loading) return <div className="loading-message">Loading Interactive Data...</div>;
@@ -312,88 +349,91 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
   };
 
   return (
-    <div className="chart-dashboard" style={{ height: '100%' }}>
-      <div className="chart-row">
-        <div className="chart-container chart-container-full chart-page-card">
-          <button
-            type="button"
-            className="chart-page-header"
-            onClick={handleChartPageChange}
-            aria-label={`Go to ${nextChart.title}`}
-          >
-            <div>
-              <p className="chart-page-eyebrow">{activeChart.pageLabel}</p>
-              <h3>{activeChart.title}</h3>
-            </div>
-            <div className="chart-page-link">
+    <Stack spacing={3}>
+      <Card
+        elevation={10}
+        sx={{
+          borderRadius: 4,
+          backgroundImage: 'linear-gradient(145deg, rgba(8,18,38,0.9), rgba(10,30,64,0.85))',
+        }}
+      >
+        <CardHeader
+          title={
+            <Stack spacing={0.5}>
+              <Typography variant="overline" color="text.secondary">
+                {activeChart.pageLabel}
+              </Typography>
+              <Typography variant="h5">{activeChart.title}</Typography>
+            </Stack>
+          }
+          action={
+            <Button
+              variant="contained"
+              color="primary"
+              endIcon={<ArrowForwardIcon />}
+              onClick={handleChartPageChange}
+            >
               View {nextChart.title}
-              <span aria-hidden="true">→</span>
-            </div>
-          </button>
-          <div className="chart-page-body">{activeChart.component}</div>
-        </div>
-      </div>
-      {/* Top 10 CFR table: full width above the map */}
-      <div className="chart-row">
-        <div className="chart-container-full">
-          <TopCFRTable data={countryCFRsTop10} />
-        </div>
-      </div>
+            </Button>
+          }
+        />
+        <Divider />
+        <CardContent>
+          <Box className="chart-wrapper">{activeChart.component}</Box>
+        </CardContent>
+      </Card>
 
-      {/* Selected country panel (shows details when a country is clicked).
-          Render the entire row only when a country is selected to avoid
-          adding vertical space between the CFR table and the map when empty. */}
-      {selectedCountry && (
-        <div className="chart-row">
-          <div className="chart-container-full">
-            <div className="country-panel">
-              <h3>{selectedCountry}</h3>
-              {/* compute stats for selected country */}
-              {(() => {
-                const rows = data.filter(r => r.Country === selectedCountry);
-                if (rows.length === 0) return <div>No data for selected country.</div>;
-                const latest = rows[rows.length - 1];
-                const timeseries = rows.map(r => ({ date: r.Date, cases: isNaN(r.Cumulative_Cases) ? 0 : r.Cumulative_Cases }));
-                return (
-                  <div>
-                    <div className="country-stats">
-                      <div><strong>Total cases:</strong> {latest.Cumulative_Cases}</div>
-                      <div><strong>Total deaths:</strong> {latest.Cumulative_Deaths}</div>
-                      <div><strong>CFR:</strong> {latest.Case_Fatality_Ratio ? `${latest.Case_Fatality_Ratio.toFixed ? latest.Case_Fatality_Ratio.toFixed(2) : latest.Case_Fatality_Ratio}%` : 'N/A'}</div>
-                    </div>
-                    <div className="sparkline">
-                      <svg viewBox="0 0 200 40" preserveAspectRatio="none">
-                        {(() => {
-                          const vals = timeseries.slice(-50).map(t => t.cases);
-                          const max = Math.max(...vals, 1);
-                          const points = vals.map((v, i) => `${(i/(vals.length-1||1))*200},${40 - (v/max)*36}`).join(' ');
-                          return <polyline fill="none" stroke="#27AE60" strokeWidth={2} points={points} />;
-                        })()}
-                      </svg>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-        </div>
-      )}
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Card elevation={8} sx={{ height: '100%' }}>
+            <CardHeader
+              title="Top 10 by Case Fatality Ratio"
+              subheader="Highest observed CFR across countries"
+              action={
+                <Chip
+                  color="secondary"
+                  label={`${countryCFRsTop10.length} highlighted`}
+                  size="small"
+                />
+              }
+            />
+            <Divider />
+            <CardContent>
+              <TopCFRTable data={countryCFRsTop10} />
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-      {/* Map: full width at the bottom */}
-      <div className="chart-row">
-        <div className="chart-container-full" style={{ minHeight: 420 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <label htmlFor="mapMetric">Map metric:</label>
-            <select id="mapMetric" value={mapMetric} onChange={e => setMapMetric(e.target.value)}>
-              <option value="Cases">Cases (Total confirmed)</option>
-              <option value="Deaths">Deaths (Total confirmed)</option>
-              <option value="CFR">Case Fatality Ratio (CFR)</option>
-            </select>
-          </div>
-          <MapChart data={countryCFRsAll} metric={mapMetric} onSelect={handleCountrySelect} />
-        </div>
-      </div>
-    </div>
+      <Card elevation={10}>
+        <CardHeader
+          title="Interactive World Map"
+          subheader="Pan, zoom, and tap regions to compare outbreaks"
+          action={
+            <FormControl size="small" sx={{ minWidth: 200 }}>
+              <InputLabel id="mapMetric-label">Metric</InputLabel>
+              <Select
+                labelId="mapMetric-label"
+                id="mapMetric"
+                value={mapMetric}
+                label="Metric"
+                onChange={(e) => setMapMetric(e.target.value)}
+              >
+                <MenuItem value="Cases">Cases (Total confirmed)</MenuItem>
+                <MenuItem value="Deaths">Deaths (Total confirmed)</MenuItem>
+                <MenuItem value="CFR">Case Fatality Ratio (CFR)</MenuItem>
+              </Select>
+            </FormControl>
+          }
+        />
+        <Divider />
+        <CardContent>
+          <Box sx={{ minHeight: 420 }}>
+            <MapChart data={countryCFRsAll} metric={mapMetric} />
+          </Box>
+        </CardContent>
+      </Card>
+    </Stack>
   );
 }
 
