@@ -24,8 +24,7 @@ const COUNTRY_OVERRIDES = {
   'czech republic': 'CZE',
   'congo (kinshasa)': 'COD',
   'congo (brazzaville)': 'COG',
-  'vatican': 'VAT'
-  ,
+  'vatican': 'VAT',
   'thailand': 'THA',
   'tajikistan': 'TJK',
   'turkmenistan': 'TKM',
@@ -48,12 +47,16 @@ const COUNTRY_OVERRIDES = {
   'vanuatu': 'VUT',
   'yemen': 'YEM',
   'zambia': 'ZMB',
-  'zimbabwe': 'ZWE'
-  ,
+  'zimbabwe': 'ZWE',
   'brunei darussalam': 'BRN',
+  'brunei': 'BRN',
   'democratic republic of the congo': 'COD',
   'democratic republic of congo': 'COD',
   'republic of the congo': 'COG',
+  'dr congo': 'COD',
+  'drc': 'COD',
+  'congo-kinshasa': 'COD',
+  'congo-brazzaville': 'COG',
   'falkland islands (malvinas)': 'FLK',
   'greenland': 'GRL',
   "lao people's democratic republic": 'LAO',
@@ -63,34 +66,20 @@ const COUNTRY_OVERRIDES = {
   'new caledonia': 'NCL',
   'puerto rico': 'PRI',
   'state of palestine': 'PSE',
+  'palestine': 'PSE',
+  'palestine, state of': 'PSE',
   'western sahara': 'ESH',
   'syrian arab republic': 'SYR',
-  'brunei': 'BRN'
-  ,
-  // Additional overrides for reported unmatched geographies
   'french southern territories': 'ATF',
   'french southern and antarctic lands': 'ATF',
-  'greenland': 'GRL',
-  'south korea': 'KOR',
-  'north korea': 'PRK',
-  "lao people's democratic republic": 'LAO',
-  'lao people\'s democratic republic': 'LAO',
-  'myanmar': 'MMR',
-  'new caledonia': 'NCL',
-  'puerto rico': 'PRI',
-  'state of palestine': 'PSE',
-  'western sahara': 'ESH',
-  'french southern territories (terres australes et antarctiques fran\u00e7aises)': 'ATF'
+  'french southern territories (terres australes et antarctiques fran\u00e7aises)': 'ATF',
+  // DPRK alternate names
+  'democratic people\'s republic of korea': 'PRK',
+  'democratic peoples republic of korea': 'PRK',
+  'korea, democratic people\'s republic of': 'PRK',
+  'korea, dpr': 'PRK',
+  'dpr korea': 'PRK'
 };
-
-// add a few more alternate textual variants that sometimes appear in topojsons
-COUNTRY_OVERRIDES['democratic people\'s republic of korea'] = 'PRK';
-COUNTRY_OVERRIDES['democratic peoples republic of korea'] = 'PRK';
-COUNTRY_OVERRIDES['korea, democratic people\'s republic of'] = 'PRK';
-COUNTRY_OVERRIDES['korea, dpr'] = 'PRK';
-COUNTRY_OVERRIDES['dpr korea'] = 'PRK';
-COUNTRY_OVERRIDES['palestine'] = 'PSE';
-COUNTRY_OVERRIDES['palestine, state of'] = 'PSE';
 
 // Names we intentionally ignore for warnings because they often have no CSV data
 const IGNORE_GEOS = new Set([
