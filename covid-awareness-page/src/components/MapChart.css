@@ -73,7 +73,17 @@
 .map-selection{
   margin-top:8px;
   font-size:13px;
-  color:#222;
+  color:#bfe6ff; /* ensure readable on dark background */
+}
+
+.map-ctrl:focus{
+  outline: 2px solid rgba(74,163,232,0.95);
+  outline-offset: 2px;
+}
+
+.rsm-geography:focus{
+  outline: 2px solid rgba(74,163,232,0.95);
+  outline-offset: 2px;
 }
 
 .rsm-geography:hover{

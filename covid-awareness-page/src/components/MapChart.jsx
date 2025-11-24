@@ -229,6 +229,15 @@ function MapChart({ data /* array of { Country, Cases, Deaths, CFR } */, metric 
     return `linear-gradient(90deg, ${stops.join(', ')})`;
   }, [domainMax]);
 
+  // Legend numeric labels (format differently for CFR vs absolute counts)
+  const legendMin = domain[0] || 0;
+  const legendMax = domain[1] || 0;
+  const numberFormat = new Intl.NumberFormat();
+  const formatLegendValue = (v) => {
+    if (metric === 'CFR') return `${v.toFixed(2)}%`;
+    return numberFormat.format(Math.round(v));
+  };
+
   // Interactive state
   const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, content: '' });
   const [selected, setSelected] = useState(null);
@@ -519,9 +528,13 @@ function MapChart({ data /* array of { Country, Cases, Deaths, CFR } */, metric 
       </div>
 
       <div className="map-legend">
-        <span>Low</span>
-        <div className="legend-bar" />
-        <span>High</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
+          <div style={{ minWidth: 80, textAlign: 'left', color: '#bfe6ff', fontSize: 12 }}>{formatLegendValue(legendMin)}</div>
+          <div style={{ flex: 1, margin: '0 8px' }}>
+            <div className="legend-bar" style={{ background: legendGradient }} aria-hidden />
+          </div>
+          <div style={{ minWidth: 80, textAlign: 'right', color: '#bfe6ff', fontSize: 12 }}>{formatLegendValue(legendMax)}</div>
+        </div>
       </div>
 
       {/* selection display handled by parent via onSelect callback */}
