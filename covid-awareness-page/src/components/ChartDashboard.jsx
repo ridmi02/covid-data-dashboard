@@ -104,6 +104,11 @@ const parseCSV = (csvText) => {
   return data;
 };
 
+const toNumber = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+};
+
 // --- CHART COMPONENTS MOVED OUTSIDE OF ChartDashboard ---
 // 
 // FIX: Removed ResponsiveContainer and set static width/height on LineChart, 
@@ -247,17 +252,18 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
       }
 
       // Compute New_Cases from Cumulative_Cases deltas per country
-      const cumCases = isNaN(row.Cumulative_Cases) ? 0 : row.Cumulative_Cases;
+      const cumCases = toNumber(row.Cumulative_Cases);
       const prevCases = prevCumCasesByCountry[row.Country] || 0;
       const newCasesDelta = Math.max(0, cumCases - prevCases);
       globalDailyDataMap[date].New_Cases += newCasesDelta;
       prevCumCasesByCountry[row.Country] = cumCases;
 
       // For deaths: prefer explicit New_Deaths if present, otherwise compute from cumulative deaths
-      if (!isNaN(row.New_Deaths)) {
-        globalDailyDataMap[date].New_Deaths += row.New_Deaths;
+      const newDeathsValue = toNumber(row.New_Deaths);
+      if (newDeathsValue > 0) {
+        globalDailyDataMap[date].New_Deaths += newDeathsValue;
       } else {
-        const cumDeaths = isNaN(row.Cumulative_Deaths) ? 0 : row.Cumulative_Deaths;
+        const cumDeaths = toNumber(row.Cumulative_Deaths);
         const prevDeaths = prevCumDeathsByCountry[row.Country] || 0;
         const newDeathsDelta = Math.max(0, cumDeaths - prevDeaths);
         globalDailyDataMap[date].New_Deaths += newDeathsDelta;
@@ -267,34 +273,25 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
 
     const trends = Object.values(globalDailyDataMap).slice(-180);
 
-    // 2. Top CFR Countries: use the latest cumulative counts per country by date
-    // Pick the row with the newest Date for each country (more robust than 'last seen')
-    const latestCountryData = data.reduce((acc, row) => {
+    // 2. Top CFR Countries: capture max cumulative counts per country to avoid trailing zero rows
+    const countryTotalsMap = data.reduce((acc, row) => {
       if (!row || !row.Country) return acc;
       const country = row.Country;
-      // parse row date safely
-      const rowDate = row.Date ? new Date(row.Date) : new Date(0);
-      const existing = acc[country];
-      const existingDate = existing && existing.Date ? new Date(existing.Date) : new Date(0);
-      // if this row is newer than existing, replace
-      if (!existing || rowDate >= existingDate) {
-        acc[country] = {
-          Country: country,
-          Date: row.Date,
-          Cumulative_Cases: isNaN(row.Cumulative_Cases) ? 0 : row.Cumulative_Cases,
-          Cumulative_Deaths: isNaN(row.Cumulative_Deaths) ? 0 : row.Cumulative_Deaths,
-          Case_Fatality_Ratio: isNaN(row.Case_Fatality_Ratio) ? undefined : row.Case_Fatality_Ratio,
-        };
-      }
+      const cases = toNumber(row.Cumulative_Cases);
+      const deaths = toNumber(row.Cumulative_Deaths);
+      const existing = acc[country] || { Country: country, Cases: 0, Deaths: 0 };
+      existing.Cases = Math.max(existing.Cases, cases);
+      existing.Deaths = Math.max(existing.Deaths, deaths);
+      acc[country] = existing;
       return acc;
     }, {});
 
-    const countryTotals = Object.values(latestCountryData)
+    const countryTotals = Object.values(countryTotalsMap)
       .map(c => ({
         Country: c.Country,
-        Cases: c.Cumulative_Cases || 0,
-        Deaths: c.Cumulative_Deaths || 0,
-        CFR: (c.Cumulative_Cases > 0) ? ((c.Cumulative_Deaths || 0) / c.Cumulative_Cases) * 100 : 0
+        Cases: c.Cases,
+        Deaths: c.Deaths,
+        CFR: c.Cases > 0 ? (c.Deaths / c.Cases) * 100 : 0,
       }))
       .filter(c => c.Country && c.Country !== 'Unknown');
 
