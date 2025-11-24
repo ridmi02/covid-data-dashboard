@@ -40,6 +40,36 @@ body {
   font-weight: 700;
 }
 
+.sub-nav {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.sub-nav a {
+  color: #bfe6ff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.sub-nav a:hover,
+.sub-nav a:focus-visible {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(74,163,232,0.6);
+}
+
+.sub-nav a.active {
+  background: rgba(74,163,232,0.15);
+  border-color: rgba(74,163,232,0.8);
+  color: #ffffff;
+}
+
 /* Data Card Layout (using Flexbox for responsiveness) */
 .data-cards-section {
   display: flex;

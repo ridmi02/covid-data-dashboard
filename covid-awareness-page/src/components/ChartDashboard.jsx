@@ -157,11 +157,12 @@ const TopCFRTable = ({ data: countryCFRs }) => (
 
 // --- MAIN DASHBOARD COMPONENT ---
 
-function ChartDashboard() {
+function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
   // 1. ALL HOOKS MUST BE DECLARED AT THE TOP (Unconditional)
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [internalChartPage, setInternalChartPage] = useState('cases');
 
   // useEffect is hook #4
   useEffect(() => {
@@ -268,7 +269,6 @@ function ChartDashboard() {
   // Selected country state for side panel
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [mapMetric, setMapMetric] = useState('Cases');
-  const [chartPage, setChartPage] = useState('cases');
 
   const handleCountrySelect = (countryName) => {
     setSelectedCountry(countryName);
@@ -284,6 +284,8 @@ function ChartDashboard() {
       return <div className="loading-message">Data is loading or empty after transformation...</div>;
     }
 
+  const isControlled = typeof controlledChartPage === 'string';
+  const activeKey = isControlled ? controlledChartPage : internalChartPage;
 
   const chartViews = {
     cases: {
@@ -300,9 +302,14 @@ function ChartDashboard() {
     },
   };
 
-  const activeChart = chartViews[chartPage] || chartViews.cases;
+  const activeChart = chartViews[activeKey] || chartViews.cases;
   const nextChartKey = activeChart.id === 'cases' ? 'deaths' : 'cases';
   const nextChart = chartViews[nextChartKey];
+  const handleChartPageChange = () => {
+    const target = nextChart.id;
+    if (onChartPageChange) onChartPageChange(target);
+    else setInternalChartPage(target);
+  };
 
   return (
     <div className="chart-dashboard" style={{ height: '100%' }}>
@@ -311,7 +318,7 @@ function ChartDashboard() {
           <button
             type="button"
             className="chart-page-header"
-            onClick={() => setChartPage(nextChart.id)}
+            onClick={handleChartPageChange}
             aria-label={`Go to ${nextChart.title}`}
           >
             <div>
