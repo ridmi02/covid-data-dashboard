@@ -134,6 +134,9 @@ const DailyCasesChart = ({ data: globalDailyTrends }) => (
         </LineChart>
       </ResponsiveContainer>
     </div>
+    <p className="chart-description">
+      Aggregated daily counts sum confirmed infections reported across all countries. Values represent the latest 180 days of data and are smoothed only by daily totals (no additional averaging).
+    </p>
   </div>
 );
 
@@ -157,6 +160,9 @@ const DailyDeathsChart = ({ data: globalDailyTrends }) => (
         </LineChart>
       </ResponsiveContainer>
     </div>
+    <p className="chart-description">
+      Shows reported COVID-19 fatalities per day. When specific daily counts are missing in the source, values are computed from cumulative totals to avoid gaps.
+    </p>
   </div>
 );
 
@@ -396,6 +402,9 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
             />
             <Divider />
             <CardContent>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                CFR (Case Fatality Ratio) reflects the proportion of recorded COVID-19 cases that resulted in death for each country. Limitations in testing/reporting can push ratios higher or lower than reality, so treat this as an indicator rather than an exact mortality rate.
+              </Typography>
               <TopCFRTable data={countryCFRsTop10} />
             </CardContent>
           </Card>
@@ -426,6 +435,9 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
         <Divider />
         <CardContent>
           <Box sx={{ minHeight: 420 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Hover or tap a country to view the selected metric. Use the dropdown to switch between cumulative cases, deaths, or computed CFR percentages; the legend updates automatically to match the current data range.
+            </Typography>
             <MapChart data={countryCFRsAll} metric={mapMetric} />
           </Box>
         </CardContent>

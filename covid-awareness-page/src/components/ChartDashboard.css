@@ -22,6 +22,14 @@
   height: clamp(280px, 52vw, 360px);
 }
 
+.chart-description {
+  font-size: 0.9rem;
+  color: #9fb3c8;
+  text-align: center;
+  margin: 0 auto 16px;
+  max-width: 520px;
+}
+
 @media (max-width: 768px) {
   .chart-wrapper {
     height: clamp(240px, 60vw, 320px);
@@ -31,6 +39,11 @@
 @media (max-width: 480px) {
   .chart-wrapper {
     height: clamp(220px, 68vw, 300px);
+  }
+
+  .chart-description {
+    font-size: 0.85rem;
+    margin-bottom: 12px;
   }
 }
 
