@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useTransition } from 'react';
 import axios from 'axios';
 import {
   LineChart,
@@ -34,6 +34,7 @@ import {
   MenuItem,
   ToggleButtonGroup,
   ToggleButton,
+  LinearProgress,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import countriesLib from 'i18n-iso-countries';
@@ -130,17 +131,27 @@ const toNumber = (value) => {
   return Number.isFinite(num) ? num : 0;
 };
 
+const continentCache = new Map();
+
 const getContinentCodeForCountry = (countryName) => {
   if (!countryName) return null;
+  if (continentCache.has(countryName)) {
+    return continentCache.get(countryName);
+  }
   try {
     const alpha2 = countriesLib.getAlpha2Code(countryName, 'en');
     if (alpha2) {
       const meta = countriesMeta[alpha2];
-      if (meta && meta.continent) return meta.continent;
+      if (meta && meta.continent) {
+        continentCache.set(countryName, meta.continent);
+        return meta.continent;
+      }
     }
   } catch (e) {
+    continentCache.set(countryName, null);
     return null;
   }
+  continentCache.set(countryName, null);
   return null;
 };
 
@@ -260,6 +271,7 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
   const [error, setError] = useState(null);
   const [internalChartPage, setInternalChartPage] = useState('cases');
   const [regionFilter, setRegionFilter] = useState('global');
+  const [isPending, startTransition] = useTransition();
 
   // useEffect is hook #4
   useEffect(() => {
@@ -364,7 +376,9 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
   const [mapMetric, setMapMetric] = useState('Cases');
 
   const handleRegionChange = (_, value) => {
-    if (value) setRegionFilter(value);
+    if (value) {
+      startTransition(() => setRegionFilter(value));
+    }
   };
 
   // 2. CONDITIONAL RETURNS COME AFTER ALL HOOKS
@@ -435,6 +449,9 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
           ))}
         </ToggleButtonGroup>
       </Stack>
+      {isPending && (
+        <LinearProgress sx={{ width: '100%', borderRadius: 999 }} color="secondary" />
+      )}
 
       <Card
         elevation={10}

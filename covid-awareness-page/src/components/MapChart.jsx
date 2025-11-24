@@ -517,14 +517,6 @@ function MapChart({ data /* array of { Country, Cases, Deaths, CFR } */, metric 
           </div>
         )}
         {/* Unmatched diagnostics panel (shows names we couldn't match) */}
-        {unmatchedList.length > 0 && (
-          <div className="map-unmatched">
-            <strong>Unmatched geographies:</strong>
-            <ul>
-              {unmatchedList.map(n => <li key={n}>{n}</li>)}
-            </ul>
-          </div>
-        )}
       </div>
 
       <div className="map-legend">
