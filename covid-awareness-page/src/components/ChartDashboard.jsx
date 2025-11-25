@@ -35,6 +35,12 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   LinearProgress,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Link as MuiLink,
+  Avatar,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import countriesLib from 'i18n-iso-countries';
@@ -129,6 +135,14 @@ const REGION_FILTERS = [
 const toNumber = (value) => {
   const num = Number(value);
   return Number.isFinite(num) ? num : 0;
+};
+
+const POLICY_TYPE_COLORS = {
+  Travel: 'primary',
+  Vaccination: 'success',
+  Testing: 'info',
+  Mask: 'warning',
+  Lockdown: 'error',
 };
 
 const continentCache = new Map();
@@ -272,6 +286,9 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
   const [internalChartPage, setInternalChartPage] = useState('cases');
   const [regionFilter, setRegionFilter] = useState('global');
   const [isPending, startTransition] = useTransition();
+  const [policyEvents, setPolicyEvents] = useState([]);
+  const [policyLoading, setPolicyLoading] = useState(false);
+  const [policyError, setPolicyError] = useState(null);
 
   // useEffect is hook #4
   useEffect(() => {
@@ -286,6 +303,25 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
         console.error("Error fetching or parsing data: ", err);
         setError("Failed to load data. Please check if 'COVID_CASES_DEATHS_ANALYSIS.csv' is in the public folder.");
         setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    setPolicyLoading(true);
+    fetch('/policy_events.json')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load policy timeline');
+        return res.json();
+      })
+      .then((events) => {
+        setPolicyEvents(Array.isArray(events) ? events : []);
+        setPolicyLoading(false);
+        setPolicyError(null);
+      })
+      .catch((err) => {
+        console.error('Policy tracker load error', err);
+        setPolicyError('Unable to load policy tracker data.');
+        setPolicyLoading(false);
       });
   }, []);
 
@@ -380,6 +416,17 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
       startTransition(() => setRegionFilter(value));
     }
   };
+
+  const filteredPolicies = useMemo(() => {
+    if (!policyEvents.length) return [];
+    return policyEvents
+      .filter((event) => {
+        if (event.region === 'global') return true;
+        if (regionFilter === 'global') return true;
+        return event.region === regionFilter;
+      })
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  }, [policyEvents, regionFilter]);
 
   // 2. CONDITIONAL RETURNS COME AFTER ALL HOOKS
 
@@ -510,6 +557,87 @@ function ChartDashboard({ chartPage: controlledChartPage, onChartPageChange }) {
           </Card>
         </Grid>
       </Grid>
+
+      <Card elevation={8}>
+        <CardHeader
+          title="Policy Tracker"
+          subheader="Key interventions aligned with the selected region"
+        />
+        <Divider />
+        <CardContent>
+          {policyLoading ? (
+            <LinearProgress color="secondary" />
+          ) : policyError ? (
+            <Typography color="error">{policyError}</Typography>
+          ) : filteredPolicies.length === 0 ? (
+            <Typography variant="body2" color="text.secondary">
+              No recorded policy events for this region yet.
+            </Typography>
+          ) : (
+            <List>
+              {filteredPolicies.map((event) => (
+                <ListItem key={`${event.date}-${event.title}`} alignItems="flex-start">
+                  <ListItemIcon>
+                    <Avatar
+                      sx={{
+                        bgcolor: `${POLICY_TYPE_COLORS[event.type] || 'primary'}.main`,
+                        width: 36,
+                        height: 36,
+                        fontSize: 12,
+                      }}
+                    >
+                      {event.type?.[0] || 'P'}
+                    </Avatar>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                        <Typography variant="subtitle2" component="span">
+                          {event.title}
+                        </Typography>
+                        {event.type && (
+                          <Chip
+                            size="small"
+                            color={POLICY_TYPE_COLORS[event.type] || 'default'}
+                            label={event.type}
+                          />
+                        )}
+                      </Stack>
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="caption" color="text.secondary" display="block">
+                          {new Date(event.date).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                          {event.region && event.region !== 'global'
+                            ? ` · ${REGION_FILTERS.find((r) => r.value === event.region)?.label || event.region}`
+                            : ' · Global'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {event.description}
+                        </Typography>
+                        {event.link && (
+                          <MuiLink
+                            href={event.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            variant="body2"
+                          >
+                            Learn more
+                          </MuiLink>
+                        )}
+                      </>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          )}
+        </CardContent>
+      </Card>
 
       <Card elevation={10}>
         <CardHeader

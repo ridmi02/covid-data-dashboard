@@ -1,0 +1,43 @@
+[
+  {
+    "date": "2020-03-15",
+    "region": "global",
+    "type": "Travel",
+    "title": "Global travel advisories",
+    "description": "Multiple countries closed borders and urged citizens abroad to return as WHO declared COVID-19 a pandemic.",
+    "link": "https://www.who.int/emergencies/diseases/novel-coronavirus-2019"
+  },
+  {
+    "date": "2021-06-01",
+    "region": "europe",
+    "type": "Vaccination",
+    "title": "EU Digital COVID Certificate",
+    "description": "EU members agreed on a digital certificate to facilitate safe travel for vaccinated, tested, or recovered citizens.",
+    "link": "https://ec.europa.eu/info/live-work-travel-eu/coronavirus-response/safe-covid-19-vaccines-europeans/eu-digital-covid-certificate_en"
+  },
+  {
+    "date": "2021-12-15",
+    "region": "africa",
+    "type": "Testing",
+    "title": "Expanded Omicron testing",
+    "description": "African CDC coordinated cross-border antigen testing to slow early Omicron spread.",
+    "link": "https://africacdc.org"
+  },
+  {
+    "date": "2022-03-10",
+    "region": "asia",
+    "type": "Mask",
+    "title": "Mask mandates relaxed (Japan)",
+    "description": "Japan shifted from mandatory indoor masking to guidance-based policies as hospitalizations fell.",
+    "link": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/mask_00001.html"
+  },
+  {
+    "date": "2022-11-11",
+    "region": "north-america",
+    "type": "Vaccination",
+    "title": "Bivalent booster rollout (US)",
+    "description": "CDC expanded updated booster eligibility to all adults to improve protection during winter.",
+    "link": "https://www.cdc.gov/media/releases/2022/s1111-covid-booster.html"
+  }
+]
+
